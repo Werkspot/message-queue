@@ -11,8 +11,6 @@ interface MessageRepositoryInterface
      */
     const MAXIMUM_DELIVERY_TRIES = 4;
 
-    public function find(string $id): MessageInterface;
-
     /**
      * @return MessageInterface[]
      */
