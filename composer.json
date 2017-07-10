@@ -1,0 +1,42 @@
+{
+    "name": "werkspot/message-queue",
+    "type": "library",
+    "description": "A generic message queue.",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Werkspot Team",
+            "email": "technology@werkspot.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Werkspot\\MessageQueue\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Werkspot\\MessageQueue\\Test\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "require": {
+        "php": "^7.1",
+        "php-amqplib/php-amqplib": "^2.6"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.0",
+        "mockery/mockery": "v1.0.0-alpha1",
+        "phpunit/phpunit": "^5.7",
+        "werkspot/apilib-testhelper": "^0.1.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:Werkspot/apilib-testhelper.git"
+        }
+    ]
+}
