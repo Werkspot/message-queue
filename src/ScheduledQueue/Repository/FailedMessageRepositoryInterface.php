@@ -7,7 +7,7 @@ interface FailedMessageRepositoryInterface
     /**
      * TODO change this array into a DTO
      *
-     * @return array with each element presented as an array(0 => QueuedCommandInterface, 1 => COUNT)
+     * @return array with each element presented as an array(0 => MessageInterface, 1 => COUNT)
      */
     public function findMessagesThatFailed(): array;
 

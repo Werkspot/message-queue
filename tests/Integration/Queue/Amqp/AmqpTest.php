@@ -2,6 +2,7 @@
 
 namespace Werkspot\MessageQueue\Test\Integration\Queue\Amqp;
 
+use DateTime;
 use ErrorException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -10,12 +11,12 @@ use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
 use Werkspot\ApiLibrary\TestHelper\MockHelper;
 use Werkspot\Instapro\Test\TestFramework\Integration\AbstractIntegrationTest;
-use Werkspot\MessageQueue\Amqp\AmqpConsumer;
-use Werkspot\MessageQueue\Amqp\AmqpMessageHandlerInterface;
-use Werkspot\MessageQueue\Amqp\AmqpProducer;
-use Werkspot\MessageQueue\Message;
-use Werkspot\MessageQueue\ProducerInterface;
-use Werkspot\MessageQueue\UuidMessageIdGenerator;
+use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpConsumer;
+use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
+use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpProducer;
+use Werkspot\MessageQueue\DeliveryQueue\Amqp\UuidMessageIdGenerator;
+use Werkspot\MessageQueue\DeliveryQueue\ProducerInterface;
+use Werkspot\MessageQueue\Message\Message;
 
 /**
  * @large
@@ -137,7 +138,7 @@ final class AmqpTest extends AbstractIntegrationTest
 
         // Publish two test messages to the queue
         foreach ($messages as $key => $value) {
-            $producer->send(new Message($key), self::getQueueName());
+            $producer->send(new Message($key, 'destination', new DateTime(), 1), self::getQueueName());
         }
 
         // Process the queue and make sure the two commands were executed

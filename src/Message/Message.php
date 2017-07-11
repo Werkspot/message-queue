@@ -4,6 +4,7 @@ namespace Werkspot\MessageQueue\Message;
 
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -31,7 +32,7 @@ final class Message implements MessageInterface
     private $priority;
 
     /**
-     * @var DateTimeInterface
+     * @var DateTimeInterface|DateTime|DateTimeImmutable
      */
     private $deliverAt;
 
@@ -57,6 +58,7 @@ final class Message implements MessageInterface
 
     /**
      * TODO create a PriorityEnum and use it here instead of an int
+     * TODO change DateTimeInterface to DateTimeImmutable
      */
     public function __construct(
         $payload,
@@ -148,7 +150,7 @@ final class Message implements MessageInterface
     {
         $interval = $this->getDateTimeIntervalForTry($this->tries + 1);
 
-        return (new DateTime())->add($interval);
+        return $this->deliverAt->add($interval);
     }
 
     /**
