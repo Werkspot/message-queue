@@ -57,8 +57,8 @@ final class Message implements MessageInterface
     private $errors;
 
     /**
-     * TODO create a PriorityEnum and use it here instead of an int
-     * TODO change DateTimeInterface to DateTimeImmutable
+     * TODO [POST CLEANUP] create a PriorityEnum and use it here instead of an int
+     * TODO [POST CLEANUP] change DateTimeInterface to DateTimeImmutable
      */
     public function __construct(
         $payload,
