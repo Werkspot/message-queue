@@ -11,6 +11,7 @@ use Werkspot\MessageQueue\DeliveryQueue\ProducerInterface;
 use Werkspot\MessageQueue\Message\MessageInterface;
 use Werkspot\MessageQueue\ScheduledQueue\ScheduledQueueServiceInterface;
 
+// TODO decouple ScheduledQueueToDeliveryQueueWorker from Doctrine
 final class ScheduledQueueToDeliveryQueueWorker implements ScheduledQueueToDeliveryQueueWorkerInterface
 {
     /**
