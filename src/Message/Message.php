@@ -55,9 +55,6 @@ final class Message implements MessageInterface
      */
     private $errors;
 
-    /**
-     * TODO [POST CLEANUP] create a PriorityEnum and use it here instead of an int
-     */
     public function __construct(
         $payload,
         string $destination,
