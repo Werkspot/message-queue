@@ -2,7 +2,7 @@
 
 namespace Werkspot\MessageQueue\Test\Integration\Queue\Amqp;
 
-use DateTime;
+use DateTimeImmutable;
 use ErrorException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -138,7 +138,7 @@ final class AmqpTest extends AbstractIntegrationTest
 
         // Publish two test messages to the queue
         foreach ($messages as $key => $value) {
-            $producer->send(new Message($key, 'destination', new DateTime(), 1), self::getQueueName());
+            $producer->send(new Message($key, 'destination', new DateTimeImmutable(), 1), self::getQueueName());
         }
 
         // Process the queue and make sure the two commands were executed

@@ -5,7 +5,6 @@ namespace Werkspot\MessageQueue\Message;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Ramsey\Uuid\Uuid;
 use Throwable;
 
@@ -32,17 +31,17 @@ final class Message implements MessageInterface
     private $priority;
 
     /**
-     * @var DateTimeInterface|DateTime|DateTimeImmutable
+     * @var DateTimeImmutable
      */
     private $deliverAt;
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
     private $createdAt;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
     private $updatedAt;
 
@@ -58,12 +57,11 @@ final class Message implements MessageInterface
 
     /**
      * TODO [POST CLEANUP] create a PriorityEnum and use it here instead of an int
-     * TODO [POST CLEANUP] change DateTimeInterface to DateTimeImmutable
      */
     public function __construct(
         $payload,
         string $destination,
-        DateTimeInterface $deliverAt,
+        DateTimeImmutable $deliverAt,
         int $priority
     ) {
         $this->id = Uuid::uuid4()->toString();
@@ -71,7 +69,7 @@ final class Message implements MessageInterface
         $this->destination = $destination;
         $this->deliverAt = $deliverAt;
         $this->priority = $priority;
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
     }
 
@@ -98,17 +96,17 @@ final class Message implements MessageInterface
         return $this->priority;
     }
 
-    public function getDeliverAt(): DateTimeInterface
+    public function getDeliverAt(): DateTimeImmutable
     {
         return $this->deliverAt;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -125,7 +123,7 @@ final class Message implements MessageInterface
 
     public function fail(Throwable $error): void
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         $errorMessage = sprintf(
             "[%s] '%s': '%s'\n%s",
@@ -146,9 +144,9 @@ final class Message implements MessageInterface
         $this->deliverAt = $this->defineDeliveryDate();
     }
 
-    private function defineDeliveryDate(): DateTimeInterface
+    private function defineDeliveryDate(): DateTimeImmutable
     {
-        $interval = $this->getDateTimeIntervalForTry($this->tries + 1);
+        $interval = $this->getDateTimeImmutableIntervalForTry($this->tries + 1);
 
         return $this->deliverAt->add($interval);
     }
@@ -162,7 +160,7 @@ final class Message implements MessageInterface
      *
      * @param int $try The try of the command, try 1 is the first time the message is delivered
      */
-    private function getDateTimeIntervalForTry(int $try): DateInterval
+    private function getDateTimeImmutableIntervalForTry(int $try): DateInterval
     {
         $waitingTimeInMinutes = ($try - 1) * ($try - 1);
 

@@ -4,7 +4,7 @@ namespace Werkspot\MessageQueue\Test\Unit\DeliveryQueue;
 
 use DateInterval;
 use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Throwable;
 use Werkspot\MessageQueue\Message\MessageInterface;
 
@@ -31,17 +31,17 @@ class MessageStub implements MessageInterface
     private $priority;
 
     /**
-     * @var DateTimeInterface
+     * @var DateTimeImmutable
      */
     private $deliverAt;
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
     private $createdAt;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
     private $updatedAt;
 
@@ -55,14 +55,14 @@ class MessageStub implements MessageInterface
      */
     private $errors;
 
-    public function __construct($payload, string $destination = '', DateTimeInterface $dequeueAt = null, int $priority = 0)
+    public function __construct($payload, string $destination = '', DateTimeImmutable $deliverAt = null, int $priority = 0)
     {
         $this->id = uniqid();
         $this->destination = $destination;
         $this->payload = $payload;
         $this->priority = $priority;
-        $this->deliverAt = $dequeueAt ?? $this->defineDequeueDate();
-        $this->createdAt = new DateTime();
+        $this->deliverAt = $deliverAt ?? $this->defineDequeueDate();
+        $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
     }
 
@@ -89,17 +89,17 @@ class MessageStub implements MessageInterface
         return $this->priority;
     }
 
-    public function getDeliverAt(): DateTimeInterface
+    public function getDeliverAt(): DateTimeImmutable
     {
         return $this->deliverAt;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -116,7 +116,7 @@ class MessageStub implements MessageInterface
 
     public function fail(Throwable $error): void
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
 
         $errorMessage = sprintf(
             "[%s] '%s': '%s'\n%s",
@@ -137,11 +137,11 @@ class MessageStub implements MessageInterface
         $this->deliverAt = $this->defineDequeueDate();
     }
 
-    private function defineDequeueDate(): DateTimeInterface
+    private function defineDequeueDate(): DateTimeImmutable
     {
         $interval = $this->getDateTimeIntervalForTry($this->tries + 1);
 
-        return (new DateTime())->add($interval);
+        return (new DateTimeImmutable())->add($interval);
     }
 
     /**

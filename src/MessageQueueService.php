@@ -2,7 +2,7 @@
 
 namespace Werkspot\MessageQueue;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 use Werkspot\MessageQueue\Message\Message;
 use Werkspot\MessageQueue\ScheduledQueue\ScheduledQueueServiceInterface;
 
@@ -21,7 +21,7 @@ final class MessageQueueService implements MessageQueueServiceInterface
     public function enqueueMessage(
         $payload,
         string $destination,
-        DateTimeInterface $deliverAt,
+        DateTimeImmutable $deliverAt,
         int $priority
     ): void {
         $this->scheduledMessageQueueService->scheduleMessage(

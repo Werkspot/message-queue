@@ -2,14 +2,9 @@
 
 namespace Werkspot\MessageQueue;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface MessageQueueServiceInterface
 {
-    public function enqueueMessage(
-        $payload,
-        string $destination,
-        DateTimeInterface $deliverAt,
-        int $priority
-    ): void;
+    public function enqueueMessage($payload, string $destination, DateTimeImmutable $deliverAt, int $priority): void;
 }

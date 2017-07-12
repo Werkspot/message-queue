@@ -2,8 +2,7 @@
 
 namespace Werkspot\MessageQueue\Message;
 
-use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Throwable;
 
 interface MessageInterface
@@ -19,11 +18,11 @@ interface MessageInterface
 
     public function getPriority(): int;
 
-    public function getDeliverAt(): DateTimeInterface;
+    public function getDeliverAt(): DateTimeImmutable;
 
-    public function getCreatedAt(): DateTime;
+    public function getCreatedAt(): DateTimeImmutable;
 
-    public function getUpdatedAt(): DateTime;
+    public function getUpdatedAt(): DateTimeImmutable;
 
     public function getTries(): int;
 

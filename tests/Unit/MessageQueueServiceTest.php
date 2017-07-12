@@ -2,7 +2,7 @@
 
 namespace Werkspot\MessageQueue\Test\Unit;
 
-use DateTime;
+use DateTimeImmutable;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
@@ -39,7 +39,7 @@ final class MessageQueueServiceTest extends TestCase
     {
         $payload = 'payload';
         $destination = 'destination';
-        $deliveryTime = new DateTime('now +1 day');
+        $deliveryTime = new DateTimeImmutable('now +1 day');
         $priority = 1;
 
         $this->scheduledMessageQueueService->shouldReceive('scheduleMessage')
