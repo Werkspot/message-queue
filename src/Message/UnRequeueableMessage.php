@@ -2,10 +2,12 @@
 
 namespace Werkspot\MessageQueue\Message;
 
+use Ramsey\Uuid\Uuid;
+
 final class UnRequeueableMessage implements UnRequeueableMessageInterface
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -14,12 +16,19 @@ final class UnRequeueableMessage implements UnRequeueableMessageInterface
      */
     private $message;
 
-    public function __construct($message)
+    /**
+     * @var string
+     */
+    private $reason;
+
+    public function __construct($message, string $reason = '')
     {
+        $this->id = Uuid::uuid4()->toString();
         $this->message = $message;
+        $this->reason = $reason;
     }
 
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }
@@ -30,5 +39,10 @@ final class UnRequeueableMessage implements UnRequeueableMessageInterface
     public function getMessage()
     {
         return $this->message;
+    }
+
+    public function getReason(): string
+    {
+        return $this->reason;
     }
 }

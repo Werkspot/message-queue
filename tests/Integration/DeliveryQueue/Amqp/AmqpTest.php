@@ -1,6 +1,6 @@
 <?php
 
-namespace Werkspot\MessageQueue\Test\Integration\Queue\Amqp;
+namespace Werkspot\MessageQueue\Test\Integration\DeliveryQueue\Amqp;
 
 use DateTimeImmutable;
 use ErrorException;

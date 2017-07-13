@@ -5,8 +5,8 @@ namespace Werkspot\MessageQueue\Test\Unit;
 use Mockery;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
-use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueue\ConsumerInterface;
+use Werkspot\MessageQueue\DeliveryQueue\MessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueue\ProducerInterface;
 use Werkspot\MessageQueue\Message\MessageInterface;
 
@@ -18,11 +18,11 @@ final class RabbitMqStub implements ProducerInterface, ConsumerInterface
     private $queue = [];
 
     /**
-     * @var AmqpMessageHandlerInterface
+     * @var MessageHandlerInterface
      */
     private $handler;
 
-    public function __construct(AmqpMessageHandlerInterface $handler)
+    public function __construct(MessageHandlerInterface $handler)
     {
         $this->handler = $handler;
     }
@@ -32,8 +32,9 @@ final class RabbitMqStub implements ProducerInterface, ConsumerInterface
      */
     public function startConsuming(string $queueName, int $maxSeconds): void
     {
+        /** @var AMQPMessage $amqpMessage */
         while ($amqpMessage = array_shift($this->queue)) {
-            $this->handler->handle($amqpMessage);
+            $this->handler->handle(unserialize($amqpMessage->getBody()));
         }
     }
 

@@ -5,10 +5,10 @@ namespace Werkspot\MessageQueue\Test\Unit;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
-use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
+use Werkspot\MessageQueue\DeliveryQueue\MessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueueToHandlerWorker;
 use Werkspot\MessageQueue\Message\Message;
 use Werkspot\MessageQueue\MessageQueueService;
@@ -19,6 +19,8 @@ use Werkspot\MessageQueue\Test\WithMessage;
 
 class MessageQueueServiceTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     const PAYLOAD = 'some payload';
     const HANDLER_METHOD = 'handle';
     const QUEUE_NAME = 'some_queue';
@@ -44,9 +46,9 @@ class MessageQueueServiceTest extends TestCase
     private $scheduledQueueService;
 
     /**
-     * @var MockInterface|AmqpMessageHandlerInterface
+     * @var MockInterface|MessageHandlerInterface
      */
-    private $amqpMessageHandlerMock;
+    private $messageHandlerMock;
 
     /**
      * @var ScheduledQueueToDeliveryQueueWorker
@@ -64,8 +66,8 @@ class MessageQueueServiceTest extends TestCase
         $this->scheduledQueueService = new ScheduledQueueService($this->queuedMessageRepositoryStub);
         $this->messageQueueService = new MessageQueueService($this->scheduledQueueService);
 
-        $this->amqpMessageHandlerMock = Mockery::mock(AmqpMessageHandlerInterface::class);
-        $this->rabbitMqStub = new RabbitMqStub($this->amqpMessageHandlerMock);
+        $this->messageHandlerMock = Mockery::mock(MessageHandlerInterface::class);
+        $this->rabbitMqStub = new RabbitMqStub($this->messageHandlerMock);
 
         $this->scheduledQueueToDeliveryQueueWorker = new ScheduledQueueToDeliveryQueueWorker(
             $this->scheduledQueueService,
@@ -94,8 +96,6 @@ class MessageQueueServiceTest extends TestCase
 
         $messageQueueService = new MessageQueueService($scheduledMessageQueueService);
         $messageQueueService->enqueueMessage($payload, $destination, $deliveryTime, $priority);
-
-        self::assertTrue(true);
     }
 
     /**
@@ -103,17 +103,16 @@ class MessageQueueServiceTest extends TestCase
      */
     public function enqueueMessage_DeliversMessageToMessageHandler(): void
     {
-        $this->amqpMessageHandlerMock->shouldReceive(self::HANDLER_METHOD)
+        $this->messageHandlerMock->shouldReceive(self::HANDLER_METHOD)
             ->once()
-            ->with(Mockery::on(function (AMQPMessage $AMQPMessage) {
-                /** @var Message $message */
-                $message = unserialize($AMQPMessage->getBody());
+            ->with(Mockery::on(function (Message $message) {
                 return $message->getPayload() === self::PAYLOAD;
             }));
 
         $this->dispatchQueuedMessage(self::PAYLOAD);
 
         self::assertCount(0, $this->queuedMessageRepositoryStub->findAll());
+        self::assertCount(0, $this->rabbitMqStub->getAllMessages());
     }
 
     private function dispatchQueuedMessage($payload): void
