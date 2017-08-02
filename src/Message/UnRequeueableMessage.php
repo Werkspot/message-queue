@@ -4,7 +4,7 @@ namespace Werkspot\MessageQueue\Message;
 
 use Ramsey\Uuid\Uuid;
 
-final class UnRequeueableMessage implements UnRequeueableMessageInterface
+class UnRequeueableMessage implements UnRequeueableMessageInterface
 {
     /**
      * @var string

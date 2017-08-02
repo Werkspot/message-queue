@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;
 use Throwable;
 
-final class Message implements MessageInterface
+class Message implements MessageInterface
 {
     /**
      * @var string
