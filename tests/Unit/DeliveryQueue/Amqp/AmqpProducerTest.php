@@ -10,6 +10,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 use PHPUnit\Framework\TestCase;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpProducer;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\MessageIdGeneratorInterface;
@@ -48,8 +49,10 @@ final class AmqpProducerTest extends TestCase
 
         $amqpMessage = new AMQPMessage(serialize($message));
         $amqpMessage->set('message_id', $generatedId);
+        $amqpMessage->set('timestamp', time());
+        $amqpMessage->set('priority', $message->getPriority());
 
-        $channel->shouldReceive('queue_declare')->twice()->with($queueName, false, true, false, false);
+        $channel->shouldReceive('queue_declare')->twice()->with($queueName, false, true, false, false, false, new IsEqual(new AMQPTable(['x-max-priority' => 10])));
         $channel->shouldReceive('basic_publish')->twice()->with(new IsEqual($amqpMessage), '', $queueName);
 
         $producer = new AmqpProducer($connection, $idGenerator);

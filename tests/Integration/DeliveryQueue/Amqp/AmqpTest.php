@@ -9,6 +9,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 use Werkspot\ApiLibrary\TestHelper\MockHelper;
 use Werkspot\Instapro\Test\TestFramework\Integration\AbstractIntegrationTest;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpConsumer;
@@ -41,7 +42,11 @@ final class AmqpTest extends AbstractIntegrationTest
         $channel = $client->channel();
 
         $channel->queue_delete(self::getQueueName());
-        $channel->queue_declare(self::getQueueName(), false, true, false, false);
+        $channel->queue_declare(self::getQueueName(), false, true, false, false, false,
+            new AMQPTable([
+                'x-max-priority' => 10
+            ])
+        );
     }
 
     /**
@@ -61,9 +66,15 @@ final class AmqpTest extends AbstractIntegrationTest
     public function happyFlow(): void
     {
         $messages = [
-            'message1' => 1,
-            'message2' => 2,
+            'message1' => ['tries' => 1, 'priority' => 2],
+            'message2' => ['tries' => 2, 'priority' => 4], // try this once again with a NACK
+            'message3' => ['tries' => 1, 'priority' => 9],
+            'message4' => ['tries' => 1, 'priority' => 1],
+            'message5' => ['tries' => 1, 'priority' => 3],
+            'message6' => ['tries' => 1, 'priority' => 8],
         ];
+
+        $expectedDeliveryOrder = [9, 8, 4, 4, 3, 2, 1];
 
         $handler = new class($messages) implements AmqpMessageHandlerInterface {
             /**
@@ -81,6 +92,8 @@ final class AmqpTest extends AbstractIntegrationTest
              */
             private $consumer;
 
+            public $handledPriorities = [];
+
             public function __construct(array &$messages)
             {
                 $this->messages = &$messages;
@@ -94,9 +107,10 @@ final class AmqpTest extends AbstractIntegrationTest
                 $message = unserialize($amqpMessage->body);
                 $channel = $amqpMessage->delivery_info['channel'];
 
-                $this->messages[$message->getPayload()]--;
+                $this->messages[$message->getPayload()]['tries']--;
+                $this->handledPriorities[] = $message->getPriority();
 
-                if ($this->messages[$message->getPayload()] <= 0) {
+                if ($this->messages[$message->getPayload()]['tries'] <= 0) {
                     $channel->basic_ack($amqpMessage->delivery_info['delivery_tag']);
                 } else {
                     $channel->basic_nack($amqpMessage->delivery_info['delivery_tag'], false, true);
@@ -121,7 +135,7 @@ final class AmqpTest extends AbstractIntegrationTest
             {
                 // Stop the client (and speed up the test, if everything is processed
                 foreach ($this->messages as $value) {
-                    if ($value != 0) {
+                    if ($value['tries'] != 0) {
                         return;
                     }
                 }
@@ -135,18 +149,19 @@ final class AmqpTest extends AbstractIntegrationTest
 
         $handler->setConsumer($consumer);
 
-
         // Publish two test messages to the queue
         foreach ($messages as $key => $value) {
-            $producer->send(new Message($key, 'destination', new DateTimeImmutable(), 1), self::getQueueName());
+            $producer->send(new Message($key, 'destination', new DateTimeImmutable(), $value['priority']), self::getQueueName());
         }
 
         // Process the queue and make sure the two commands were executed
         $consumer->startConsuming(self::getQueueName(), 7);
 
         foreach ($messages as $key => $value) {
-            self::assertSame(0, $value);
+            self::assertSame(0, $value['tries']);
         }
+
+        self::assertSame($expectedDeliveryOrder, $handler->handledPriorities);
     }
 
     /**

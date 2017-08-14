@@ -7,6 +7,7 @@ namespace Werkspot\MessageQueue\DeliveryQueue\Amqp;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Connection\AMQPSSLConnection;
+use PhpAmqpLib\Wire\AMQPTable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
@@ -99,6 +100,11 @@ final class AmqpConsumer implements ConsumerInterface
         $start = time();
 
         $this->channel = $this->connection->channel();
+
+        // Make sure  we get messages 1-by-1 so rabbitmq-server can distribute the work properly and implement
+        // the priority properly
+        $this->channel->basic_qos(0, 1, true);
+
         $this->channel->basic_consume(
             $queueName,
             '',
@@ -106,7 +112,11 @@ final class AmqpConsumer implements ConsumerInterface
             false,
             false,
             false,
-            [$this->handler, 'handle']
+            [$this->handler, 'handle'],
+            null,
+            new AMQPTable(array(
+                "x-max-priority" => 10
+            ))
         );
 
         while (count($this->channel->callbacks) && !$this->exitSignalReceived) {
