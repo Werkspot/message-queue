@@ -12,6 +12,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Werkspot\ApiLibrary\TestHelper\MockHelper;
 use Werkspot\Instapro\Test\TestFramework\Integration\AbstractIntegrationTest;
+use Werkspot\MessageBus\MessageQueue\Priority;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpConsumer;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpProducer;
@@ -66,15 +67,23 @@ final class AmqpTest extends AbstractIntegrationTest
     public function happyFlow(): void
     {
         $messages = [
-            'message1' => ['tries' => 1, 'priority' => 2],
-            'message2' => ['tries' => 2, 'priority' => 4], // try this once again with a NACK
-            'message3' => ['tries' => 1, 'priority' => 9],
-            'message4' => ['tries' => 1, 'priority' => 1],
-            'message5' => ['tries' => 1, 'priority' => 3],
-            'message6' => ['tries' => 1, 'priority' => 8],
+            'message1' => ['tries' => 1, 'priority' => Priority::LOWEST],
+            'message2' => ['tries' => 2, 'priority' => Priority::LOW], // try this once again with a NACK
+            'message3' => ['tries' => 1, 'priority' => Priority::URGENT],
+            'message4' => ['tries' => 1, 'priority' => Priority::NORMAL],
+            'message5' => ['tries' => 1, 'priority' => Priority::LOWEST],
+            'message6' => ['tries' => 1, 'priority' => Priority::HIGH],
         ];
 
-        $expectedDeliveryOrder = [9, 8, 4, 4, 3, 2, 1];
+        $expectedDeliveryOrder = [
+            Priority::URGENT,
+            Priority::HIGH,
+            Priority::NORMAL,
+            Priority::LOW,
+            Priority::LOW, // this is the retrying
+            Priority::LOWEST,
+            Priority::LOWEST
+        ];
 
         $handler = new class($messages) implements AmqpMessageHandlerInterface {
             /**
