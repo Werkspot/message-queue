@@ -18,7 +18,8 @@ final class WithMessage
                     && $expectedMessage->getTries() === $actualMessage->getTries()
                     && $expectedMessage->getErrors() === $actualMessage->getErrors()
                     && $expectedMessage->getPriority() === $actualMessage->getPriority()
-                    && $expectedMessage->getDeliverAt()->getTimestamp() === $actualMessage->getDeliverAt()->getTimestamp();
+                    && $expectedMessage->getDeliverAt()->getTimestamp() === $actualMessage->getDeliverAt()->getTimestamp()
+                    && $expectedMessage->getMetadata() === $actualMessage->getMetadata();
             }
         );
     }

@@ -29,4 +29,6 @@ interface MessageInterface
     public function getErrors(): ?string;
 
     public function fail(Throwable $error): void;
+
+    public function getMetadata(): array;
 }

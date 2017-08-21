@@ -55,17 +55,24 @@ class Message implements MessageInterface
      */
     private $errors;
 
+    /**
+     * @var array
+     */
+    private $metadata;
+
     public function __construct(
         $payload,
         string $destination,
         DateTimeImmutable $deliverAt,
-        int $priority
+        int $priority,
+        array $metadata = []
     ) {
         $this->id = Uuid::uuid4()->toString();
         $this->payload = $payload;
         $this->destination = $destination;
         $this->deliverAt = $deliverAt;
         $this->priority = $priority;
+        $this->metadata = $metadata;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
     }
@@ -134,6 +141,11 @@ class Message implements MessageInterface
 
         $this->tries++;
         $this->updateDeliveryDate();
+    }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
     }
 
     private function updateDeliveryDate(): void

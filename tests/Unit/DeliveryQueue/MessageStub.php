@@ -55,8 +55,18 @@ class MessageStub implements MessageInterface
      */
     private $errors;
 
-    public function __construct($payload, string $destination = '', DateTimeImmutable $deliverAt = null, int $priority = 0)
-    {
+    /**
+     * @var array
+     */
+    private $metadata;
+
+    public function __construct(
+        $payload,
+        string $destination = '',
+        DateTimeImmutable $deliverAt = null,
+        int $priority = 0,
+        array $metadata = []
+    ) {
         $this->id = uniqid();
         $this->destination = $destination;
         $this->payload = $payload;
@@ -64,6 +74,7 @@ class MessageStub implements MessageInterface
         $this->deliverAt = $deliverAt ?? $this->defineDequeueDate();
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
+        $this->metadata = $metadata;
     }
 
     public function getId(): string
@@ -130,6 +141,11 @@ class MessageStub implements MessageInterface
 
         $this->tries++;
         $this->updateDequeueDate();
+    }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
     }
 
     private function updateDequeueDate(): void
