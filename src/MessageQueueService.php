@@ -22,14 +22,16 @@ final class MessageQueueService implements MessageQueueServiceInterface
         $payload,
         string $destination,
         DateTimeImmutable $deliverAt,
-        int $priority
+        int $priority,
+        array $metadata
     ): void {
         $this->scheduledMessageQueueService->scheduleMessage(
             new Message(
                 $payload,
                 $destination,
                 $deliverAt,
-                $priority
+                $priority,
+                $metadata
             )
         );
     }

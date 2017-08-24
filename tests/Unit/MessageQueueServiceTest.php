@@ -8,6 +8,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
+use Werkspot\IgluMetadata\Test\TestDataObject;
 use Werkspot\MessageQueue\DeliveryQueue\MessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueueToHandlerWorker;
 use Werkspot\MessageQueue\Message\Message;
@@ -85,6 +86,7 @@ class MessageQueueServiceTest extends TestCase
     public function enqueueMessage_SchedulesTheMessage(): void
     {
         $payload = 'payload';
+        $metadata = [new TestDataObject()];
         $destination = 'destination';
         $deliveryTime = new DateTimeImmutable('now +1 day');
         $priority = 1;
@@ -92,10 +94,10 @@ class MessageQueueServiceTest extends TestCase
         $scheduledMessageQueueService = Mockery::mock(ScheduledQueueServiceInterface::class);
         $scheduledMessageQueueService->shouldReceive('scheduleMessage')
             ->once()
-            ->with(WithMessage::equalTo(new Message($payload, $destination, $deliveryTime, $priority)));
+            ->with(WithMessage::equalTo(new Message($payload, $destination, $deliveryTime, $priority, $metadata)));
 
         $messageQueueService = new MessageQueueService($scheduledMessageQueueService);
-        $messageQueueService->enqueueMessage($payload, $destination, $deliveryTime, $priority);
+        $messageQueueService->enqueueMessage($payload, $destination, $deliveryTime, $priority, $metadata);
     }
 
     /**
@@ -117,7 +119,7 @@ class MessageQueueServiceTest extends TestCase
 
     private function dispatchQueuedMessage($payload): void
     {
-        $this->messageQueueService->enqueueMessage($payload, 'dummy destination', new DateTimeImmutable(), 1);
+        $this->messageQueueService->enqueueMessage($payload, 'dummy destination', new DateTimeImmutable(), 1, []);
 
         self::assertCount(1, $this->queuedMessageRepositoryStub->findAll(), 'Message did not reach the ScheduleMessageQueue');
 
