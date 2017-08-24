@@ -55,7 +55,8 @@ final class ScheduledQueueToDeliveryQueueWorker implements ScheduledQueueToDeliv
 
     public function moveMessageBatch(int $batchSize, callable $afterMessageTransfer = null): int
     {
-        $afterMessageTransfer = $afterMessageTransfer ?? function(){};
+        $afterMessageTransfer = $afterMessageTransfer ?? function () {
+        };
         $messageList = $this->scheduledMessageService->findScheduledMessageList($batchSize);
 
         foreach ($messageList as $message) {

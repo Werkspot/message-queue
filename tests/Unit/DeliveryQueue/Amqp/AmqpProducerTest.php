@@ -44,7 +44,7 @@ final class AmqpProducerTest extends TestCase
         $generatedId = 'the-message-id';
         $idGenerator->shouldReceive('generateId')->twice()->andReturn($generatedId);
 
-        $connection->shouldReceive('channel')->once()->andReturn ($channel);
+        $connection->shouldReceive('channel')->once()->andReturn($channel);
 
         $amqpMessage = new AMQPMessage(serialize($message));
         $amqpMessage->set('message_id', $generatedId);
