@@ -43,7 +43,13 @@ final class AmqpTest extends AbstractIntegrationTest
         $channel = $client->channel();
 
         $channel->queue_delete(self::getQueueName());
-        $channel->queue_declare(self::getQueueName(), false, true, false, false, false,
+        $channel->queue_declare(
+            self::getQueueName(),
+            false,
+            true,
+            false,
+            false,
+            false,
             new AMQPTable([
                 'x-max-priority' => 10
             ])

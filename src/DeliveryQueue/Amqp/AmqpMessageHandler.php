@@ -239,7 +239,7 @@ final class AmqpMessageHandler implements AmqpMessageHandlerInterface
         $this->amqpMessage = null;
     }
 
-    private function isHandlingMessage(): bool
+    public function isHandlingMessage(): bool
     {
         return $this->amqpMessage !== null;
     }

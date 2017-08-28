@@ -7,4 +7,5 @@ use PhpAmqpLib\Message\AMQPMessage;
 interface AmqpMessageHandlerInterface
 {
     public function handle(AMQPMessage $amqpMessage): void;
+    public function isHandlingMessage(): bool;
 }

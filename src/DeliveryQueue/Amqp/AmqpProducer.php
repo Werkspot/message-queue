@@ -39,7 +39,7 @@ class AmqpProducer implements ProducerInterface
         $amqpMessage = new AMQPMessage(serialize($message));
         $amqpMessage->set('message_id', $this->idGenerator->generateId());
         $amqpMessage->set('priority', $message->getPriority());
-        $amqpMessage->set('timestamp', time());
+        $amqpMessage->set('timestamp', (int)(microtime(true) * 1000));
 
         $this->channel->basic_publish($amqpMessage, '', $queueName);
     }
@@ -52,7 +52,13 @@ class AmqpProducer implements ProducerInterface
             $this->channel = $this->connection->channel();
         }
 
-        $this->channel->queue_declare($queueName, false, true, false, false, false,
+        $this->channel->queue_declare(
+            $queueName,
+            false,
+            true,
+            false,
+            false,
+            false,
             new AMQPTable(array(
                 "x-max-priority" => 10
             ))

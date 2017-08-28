@@ -49,11 +49,24 @@ final class AmqpProducerTest extends TestCase
 
         $amqpMessage = new AMQPMessage(serialize($message));
         $amqpMessage->set('message_id', $generatedId);
-        $amqpMessage->set('timestamp', time());
+        $amqpMessage->set('timestamp', time() . '000');
         $amqpMessage->set('priority', $message->getPriority());
 
         $channel->shouldReceive('queue_declare')->twice()->with($queueName, false, true, false, false, false, new IsEqual(new AMQPTable(['x-max-priority' => 10])));
-        $channel->shouldReceive('basic_publish')->twice()->with(new IsEqual($amqpMessage), '', $queueName);
+        $channel->shouldReceive('basic_publish')->twice()->with(
+            Mockery::on(
+                function (AMQPMessage $sentMessage) use ($amqpMessage) {
+                    self::assertSame($amqpMessage->getBody(), $sentMessage->getBody());
+                    self::assertSame($amqpMessage->get('message_id'), $sentMessage->get('message_id'));
+                    self::assertSame($amqpMessage->get('priority'), $sentMessage->get('priority'));
+                    self::assertEquals($amqpMessage->get('timestamp'), $sentMessage->get('timestamp'), '', 2000);
+
+                    return true;
+                }
+            ),
+            '',
+            $queueName
+        );
 
         $producer = new AmqpProducer($connection, $idGenerator);
         $producer->send($message, $queueName);
