@@ -23,5 +23,8 @@ interface MessageRepositoryInterface
 
     public function save(MessageInterface $message): void;
 
+    /**
+     * This method must persist/flush the changes immediately to prevent failed deletes because of later errors
+     */
     public function delete(MessageInterface $message): void;
 }
