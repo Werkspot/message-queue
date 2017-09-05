@@ -10,9 +10,8 @@ use PhpAmqpLib\Connection\AMQPLazyConnection;
 use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
+use PHPUnit\Framework\TestCase;
 use Werkspot\ApiLibrary\TestHelper\MockHelper;
-use Werkspot\Instapro\Test\TestFramework\Integration\AbstractIntegrationTest;
-use Werkspot\MessageBus\MessageQueue\Priority;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpConsumer;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpProducer;
@@ -22,12 +21,18 @@ use Werkspot\MessageQueue\Message\Message;
 
 /**
  * @large
- *
- * TODO when we extract the package to its own repo, make this extend PHPUnit_Framework_TestCase
  */
-final class AmqpTest extends AbstractIntegrationTest
+final class AmqpTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
+
+    private const DEFAULT_RABBITMQ_PORT = 5672;
+
+    private const PRIORITY_LOWEST = 1;
+    private const PRIORITY_LOW = 3;
+    private const PRIORITY_NORMAL = 5;
+    private const PRIORITY_HIGH = 7;
+    private const PRIORITY_URGENT = 9;
 
     /**
      * @var string
@@ -73,33 +78,31 @@ final class AmqpTest extends AbstractIntegrationTest
     public function happyFlow(): void
     {
         $messages = [
-            'message1' => ['tries' => 1, 'priority' => Priority::LOWEST],
-            'message2' => ['tries' => 2, 'priority' => Priority::LOW], // try this once again with a NACK
-            'message3' => ['tries' => 1, 'priority' => Priority::URGENT],
-            'message4' => ['tries' => 1, 'priority' => Priority::NORMAL],
-            'message5' => ['tries' => 1, 'priority' => Priority::LOWEST],
-            'message6' => ['tries' => 1, 'priority' => Priority::HIGH],
+            'message1' => ['tries' => 1, 'priority' => self::PRIORITY_LOWEST],
+            'message2' => ['tries' => 2, 'priority' => self::PRIORITY_LOW], // try this once again with a NACK
+            'message3' => ['tries' => 1, 'priority' => self::PRIORITY_URGENT],
+            'message4' => ['tries' => 1, 'priority' => self::PRIORITY_NORMAL],
+            'message5' => ['tries' => 1, 'priority' => self::PRIORITY_LOWEST],
+            'message6' => ['tries' => 1, 'priority' => self::PRIORITY_HIGH],
         ];
 
         $expectedDeliveryOrder = [
-            Priority::URGENT,
-            Priority::HIGH,
-            Priority::NORMAL,
-            Priority::LOW,
-            Priority::LOW, // this is the retrying
-            Priority::LOWEST,
-            Priority::LOWEST
+            self::PRIORITY_URGENT,
+            self::PRIORITY_HIGH,
+            self::PRIORITY_NORMAL,
+            self::PRIORITY_LOW,
+            self::PRIORITY_LOW, // this is the retrying
+            self::PRIORITY_LOWEST,
+            self::PRIORITY_LOWEST,
         ];
 
         $handler = new class($messages) implements AmqpMessageHandlerInterface {
+
             /**
              * @var array
              */
             private $messages;
 
-            /**
-             * @var bool
-             */
             private $isHandlingMessage = false;
 
             /**
@@ -107,6 +110,9 @@ final class AmqpTest extends AbstractIntegrationTest
              */
             private $consumer;
 
+            /**
+             * @var int[]
+             */
             public $handledPriorities = [];
 
             public function __construct(array &$messages)
@@ -246,28 +252,24 @@ final class AmqpTest extends AbstractIntegrationTest
         );
     }
 
-    // TODO when we extract the package to its own repo, make this use `return getenv('RABBITMQ_HOST');`
     private static function getRabbitHost(): string
     {
-        return self::getParameter('rabbitmq.host');
+        return getenv('RABBITMQ_HOST');
     }
 
-    // TODO when we extract the package to its own repo, make this use `return getenv('RABBITMQ_PORT');`
     private static function getRabbitPort(): int
     {
-        $port = self::getParameter('rabbitmq.port');
-        return $port > 0 ? $port : 5672;
+        $port = getenv('RABBITMQ_PORT');
+        return $port ?: self::DEFAULT_RABBITMQ_PORT;
     }
 
-    // TODO when we extract the package to its own repo, make this use `return getenv('RABBITMQ_USER');`
     private static function getRabbitUser(): string
     {
-        return self::getParameter('rabbitmq.user');
+        return getenv('RABBITMQ_USER');
     }
 
-    // TODO when we extract the package to its own repo, make this use `return getenv('RABBITMQ_PASSWORD');`
     private static function getRabbitPassword(): string
     {
-        return self::getParameter('rabbitmq.password');
+        return getenv('RABBITMQ_PASSWORD');
     }
 }
