@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+    colors                                     = "true"
+    beStrictAboutOutputDuringTests             = "true"
+    beStrictAboutChangesToGlobalState          = "true"
+    beStrictAboutTodoAnnotatedTests            = "true"
+    beStrictAboutResourceUsageDuringSmallTests = "true"
+    enforceTimeLimit                           = "true"
+    timeoutForMediumTests                      = "4"
+    timeoutForLargeTests                       = "8"
+    verbose                                    = "true"
+    bootstrap                                  = "./tests/phpunit.bootstrap.php" >
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>src</directory> <!-- Perform code coverage for files in this folder -->
+        </whitelist>
+    </filter>
+
+    <php>
+        <env name="RABBITMQ_HOST" value="queue"/>
+        <env name="RABBITMQ_USER" value="alice"/>
+        <env name="RABBITMQ_PASSWORD" value="in_wonderland"/>
+    </php>
+</phpunit>
