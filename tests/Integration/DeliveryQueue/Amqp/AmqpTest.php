@@ -11,13 +11,13 @@ use PhpAmqpLib\Exception\AMQPProtocolConnectionException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use PHPUnit\Framework\TestCase;
-use Werkspot\ApiLibrary\TestHelper\MockHelper;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpConsumer;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpMessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\AmqpProducer;
 use Werkspot\MessageQueue\DeliveryQueue\Amqp\UuidMessageIdGenerator;
 use Werkspot\MessageQueue\DeliveryQueue\ProducerInterface;
 use Werkspot\MessageQueue\Message\Message;
+use Werkspot\MessageQueue\Test\ReflectionHelper;
 
 /**
  * @large
@@ -161,7 +161,7 @@ final class AmqpTest extends TestCase
                     }
                 }
 
-                MockHelper::setProtectedProperty($this->consumer, 'exitSignalReceived', true);
+                ReflectionHelper::setProtectedProperty($this->consumer, 'exitSignalReceived', true);
             }
         };
 
