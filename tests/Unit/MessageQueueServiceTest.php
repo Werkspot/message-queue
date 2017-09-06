@@ -3,12 +3,10 @@
 namespace Werkspot\MessageQueue\Test\Unit;
 
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
-use Werkspot\IgluMetadata\Test\TestDataObject;
 use Werkspot\MessageQueue\DeliveryQueue\MessageHandlerInterface;
 use Werkspot\MessageQueue\DeliveryQueueToHandlerWorker;
 use Werkspot\MessageQueue\Message\Message;
@@ -72,7 +70,6 @@ class MessageQueueServiceTest extends TestCase
 
         $this->scheduledQueueToDeliveryQueueWorker = new ScheduledQueueToDeliveryQueueWorker(
             $this->scheduledQueueService,
-            Mockery::mock(EntityManagerInterface::class),
             $this->rabbitMqStub,
             self::QUEUE_NAME
         );
