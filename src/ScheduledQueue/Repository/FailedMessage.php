@@ -31,9 +31,4 @@ class FailedMessage
     {
         return $this->count;
     }
-
-    public function addCount(int $count): void
-    {
-        $this->count += $count;
-    }
 }
