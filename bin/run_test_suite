@@ -2,6 +2,12 @@
 <?php
 
 $rootDir = __DIR__ . '/..';
+$returnVal = 0;
 
-system("docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application php 'vendor/bin/phpunit'");
+system(
+    "docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application php 'vendor/bin/phpunit'",
+    $returnVal
+);
 system("docker-compose -f $rootDir/tests/container/docker-compose.yml down");
+
+exit($returnVal);

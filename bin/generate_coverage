@@ -2,6 +2,12 @@
 <?php
 
 $rootDir = __DIR__ . '/..';
+$returnVal = 0;
 
-system("docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application php -dzend_extension=xdebug.so vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover.xml");
+system(
+    "docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application php -dzend_extension=xdebug.so vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover.xml",
+    $returnVal
+);
 system("docker-compose -f $rootDir/tests/container/docker-compose.yml down");
+
+exit($returnVal);

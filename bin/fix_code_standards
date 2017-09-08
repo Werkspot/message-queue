@@ -2,5 +2,11 @@
 <?php
 
 $rootDir = __DIR__ . '/..';
+$returnVal = 0;
 
-system("docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application php 'vendor/bin/php-cs-fixer fix --verbose'");
+system(
+    "docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application php 'vendor/bin/php-cs-fixer fix --verbose'",
+    $returnVal
+);
+
+exit($returnVal);
