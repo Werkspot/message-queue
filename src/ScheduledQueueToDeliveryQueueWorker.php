@@ -3,7 +3,6 @@
 namespace Werkspot\MessageQueue;
 
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
@@ -11,7 +10,6 @@ use Werkspot\MessageQueue\DeliveryQueue\ProducerInterface;
 use Werkspot\MessageQueue\Message\MessageInterface;
 use Werkspot\MessageQueue\ScheduledQueue\ScheduledQueueServiceInterface;
 
-// TODO [CLEANUP] decouple ScheduledQueueToDeliveryQueueWorker from Doctrine
 final class ScheduledQueueToDeliveryQueueWorker implements ScheduledQueueToDeliveryQueueWorkerInterface
 {
     /**
@@ -34,20 +32,13 @@ final class ScheduledQueueToDeliveryQueueWorker implements ScheduledQueueToDeliv
      */
     private $logger;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
     public function __construct(
         ScheduledQueueServiceInterface $scheduledMessageService,
-        EntityManagerInterface $entityManager,
         ProducerInterface $deliveryQueueMessageProducer,
         string $deliveryQueueName,
         LoggerInterface $logger = null
     ) {
         $this->scheduledMessageService = $scheduledMessageService;
-        $this->entityManager = $entityManager;
         $this->deliveryQueueMessageProducer = $deliveryQueueMessageProducer;
         $this->deliveryQueueName = $deliveryQueueName;
         $this->logger = $logger ?? new NullLogger();
@@ -74,7 +65,6 @@ final class ScheduledQueueToDeliveryQueueWorker implements ScheduledQueueToDeliv
         try {
             $this->sendToDeliveryQueue($message);
             $this->scheduledMessageService->unscheduleMessage($message);
-            $this->entityManager->flush();
             $this->logger->info('Successfully moved scheduled message to delivery queue: ' . $message->getId());
         } catch (Throwable $error) {
             $this->logger->error('Error moving scheduled message ' . $message->getId() . ' to delivery queue: ' . $this->getLogErrorMessage($error));

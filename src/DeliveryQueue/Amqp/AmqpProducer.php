@@ -39,7 +39,7 @@ class AmqpProducer implements ProducerInterface
         $amqpMessage = new AMQPMessage(serialize($message));
         $amqpMessage->set('message_id', $this->idGenerator->generateId());
         $amqpMessage->set('priority', $message->getPriority());
-        $amqpMessage->set('timestamp', (int)(microtime(true) * 1000));
+        $amqpMessage->set('timestamp', microtime(true) * 1000);
 
         $this->channel->basic_publish($amqpMessage, '', $queueName);
     }

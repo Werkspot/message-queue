@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+
+$rootDir = __DIR__ . '/..';
+
+system("docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application php 'vendor/bin/php-cs-fixer fix --verbose'");

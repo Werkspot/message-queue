@@ -1,0 +1,7 @@
+#!/usr/bin/env php
+<?php
+
+$rootDir = __DIR__ . '/..';
+
+system("docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application php 'vendor/bin/phpunit'");
+system("docker-compose -f $rootDir/tests/container/docker-compose.yml down");

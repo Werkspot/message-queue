@@ -1,0 +1,21 @@
+# Autodetect text files
+* text=auto
+
+# Force the following filetypes to have unix eols, so Windows does not break them
+*.* text eol=lf
+
+# Force these files to be treated as binaries
+*.7z binary
+*.doc binary
+*.eot binary
+*.gif binary
+*.jpg binary
+*.pdf binary
+*.png binary
+*.so binary
+*.svg binary
+*.tar.gz binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.zip binary

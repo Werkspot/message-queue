@@ -1,0 +1,24 @@
+version: '3.2'
+
+services:
+  application:
+    container_name: application
+    build:
+      context: .
+      dockerfile: application.dockerfile
+    working_dir: /opt/message-queue
+    volumes:
+      - ../../:/opt/message-queue
+    links:
+      - queue
+
+  queue:
+    container_name: queue
+    image: "rabbitmq:3.6-alpine"
+    environment:
+      RABBITMQ_DEFAULT_USER: "alice"
+      RABBITMQ_DEFAULT_PASS: "in_wonderland"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"

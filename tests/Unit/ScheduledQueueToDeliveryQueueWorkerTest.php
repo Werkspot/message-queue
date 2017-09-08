@@ -2,7 +2,6 @@
 
 namespace Werkspot\MessageQueue\Test\Unit;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -26,11 +25,6 @@ final class ScheduledQueueToDeliveryQueueWorkerTest extends TestCase
     private $scheduledMessageQueueServiceMock;
 
     /**
-     * @var MockInterface|EntityManagerInterface
-     */
-    private $entityManagerMock;
-
-    /**
      * @var MockInterface|ProducerInterface
      */
     private $deliveryQueueMessageProducerMock;
@@ -48,12 +42,10 @@ final class ScheduledQueueToDeliveryQueueWorkerTest extends TestCase
     public function setUp(): void
     {
         $this->scheduledMessageQueueServiceMock = Mockery::mock(ScheduledQueueServiceInterface::class);
-        $this->entityManagerMock = Mockery::mock(EntityManagerInterface::class);
         $this->deliveryQueueMessageProducerMock = Mockery::mock(ProducerInterface::class);
         $this->loggerMock = Mockery::mock(LoggerInterface::class);
         $this->scheduledQueueToDeliveryQueueWorker = new ScheduledQueueToDeliveryQueueWorker(
             $this->scheduledMessageQueueServiceMock,
-            $this->entityManagerMock,
             $this->deliveryQueueMessageProducerMock,
             self::QUEUE_NAME,
             $this->loggerMock
@@ -100,7 +92,6 @@ final class ScheduledQueueToDeliveryQueueWorkerTest extends TestCase
         $this->loggerMock->shouldReceive('info')->times($batchSize * 2);
         $this->deliveryQueueMessageProducerMock->shouldReceive('send')->times($batchSize);
         $this->scheduledMessageQueueServiceMock->shouldReceive('unscheduleMessage')->times($batchSize);
-        $this->entityManagerMock->shouldReceive('flush')->times($batchSize);
 
         $this->scheduledQueueToDeliveryQueueWorker->moveMessageBatch($batchSize);
     }
@@ -125,14 +116,14 @@ final class ScheduledQueueToDeliveryQueueWorkerTest extends TestCase
                 ]
             );
 
-        $this->deliveryQueueMessageProducerMock->shouldReceive('send')->times(2);
+        $this->deliveryQueueMessageProducerMock->shouldReceive('send')->times($successfulBatch1 = 2);
         $this->deliveryQueueMessageProducerMock->shouldReceive('send')
-            ->once()
+            ->times($unSuccessfulBatch = 1)
             ->andThrow(new Exception('An error sending message to delivery queue.'));
-        $this->deliveryQueueMessageProducerMock->shouldReceive('send')->times(2);
+        $this->deliveryQueueMessageProducerMock->shouldReceive('send')->times($successfulBatch2 = 2);
         $this->scheduledMessageQueueServiceMock->shouldReceive('unscheduleMessage')->times($batchSize - 1);
-        $this->loggerMock->shouldReceive('info')->times($batchSize);
-        $this->loggerMock->shouldReceive('error')->times($batchSize);
+        $this->loggerMock->shouldReceive('info')->times($batchSize + $successfulBatch1 + $successfulBatch2);
+        $this->loggerMock->shouldReceive('error')->times($unSuccessfulBatch);
 
         $this->scheduledQueueToDeliveryQueueWorker->moveMessageBatch($batchSize);
     }
