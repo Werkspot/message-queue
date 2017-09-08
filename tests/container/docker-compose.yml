@@ -3,9 +3,7 @@ version: '3.2'
 services:
   application:
     container_name: application
-    build:
-      context: .
-      dockerfile: application.dockerfile
+    image: "werkspot/message-queue:application_php_7.1"
     working_dir: /opt/message-queue
     volumes:
       - ../../:/opt/message-queue
