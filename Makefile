@@ -14,11 +14,11 @@ install-dependencies:
 update-dependencies:
 	composer update
 
-coverage:
-	./bin/generate_coverage
-
 cs-fix:
 	./bin/fix_code_standards
 
 test:
 	./bin/run_test_suite
+
+test_with_coverage:
+	./bin/run_test_suite_with_coverage
