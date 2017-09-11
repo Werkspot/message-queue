@@ -2,10 +2,14 @@
 <?php
 
 $rootDir = __DIR__ . '/..';
+$argumentList = $argv;
+unset($argumentList[0]);
 $returnVal = 0;
 
 system(
-    "docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application php 'vendor/bin/php-cs-fixer fix --verbose'",
+    "docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application "
+    . "php vendor/bin/php-cs-fixer fix --verbose "
+    . implode(' ' , $argumentList),
     $returnVal
 );
 
