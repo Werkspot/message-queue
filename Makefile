@@ -18,7 +18,9 @@ cs-fix:
 	./bin/fix_code_standards
 
 test:
+	./bin/fix_code_standards --dry-run
 	./bin/run_test_suite
 
 test_with_coverage:
+	./bin/fix_code_standards --dry-run
 	./bin/run_test_suite_with_coverage
