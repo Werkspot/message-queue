@@ -8,6 +8,6 @@ final class UuidMessageIdGenerator implements MessageIdGeneratorInterface
 {
     public function generateId(): string
     {
-        return Uuid::uuid4();
+        return Uuid::uuid4()->toString();
     }
 }
