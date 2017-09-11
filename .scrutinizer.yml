@@ -1,0 +1,36 @@
+build:
+
+  dependencies:
+    before:
+      - echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+      - wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+      - sudo apt-get update
+      - sudo apt-get install -y rabbitmq-server=3.6.12-1
+
+  environment:
+    variables:
+      ENV: 'ci'
+    mysql: false
+    postgresql: false
+    redis: false
+    rabbitmq: false
+    php:
+      version: 7.1
+
+  tests:
+    override:
+      -
+        command: make test_with_coverage
+        coverage:
+          file: coverage.clover.xml
+          format: php-clover
+
+filter:
+  paths:
+    - "src/"
+  dependency_paths:
+    - "vendor/"
+
+build_failure_conditions:
+  - 'issues.new.exists'
+  - 'project.metric_change("scrutinizer.test_coverage", < -0.05)'
