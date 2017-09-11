@@ -6,7 +6,6 @@ namespace Werkspot\MessageQueue\DeliveryQueue\Amqp;
 
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
-use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Wire\AMQPTable;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -16,7 +15,7 @@ use Werkspot\MessageQueue\DeliveryQueue\ConsumerInterface;
 final class AmqpConsumer implements ConsumerInterface
 {
     /**
-     * @var AMQPSSLConnection
+     * @var AMQPLazyConnection
      */
     private $connection;
 
