@@ -3,7 +3,7 @@
     "type": "library",
     "description": "A generic message queue.",
     "keywords": ["message", "queue", "rabbitmq"],
-    "version": "2.0.0",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
