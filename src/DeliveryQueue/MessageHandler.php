@@ -138,10 +138,10 @@ final class MessageHandler implements MessageHandlerInterface
             . ', ' . $message->getUpdatedAt()->format(DateTime::ATOM)
             . ', ' . $message->getTries()
             . ', ' . $message->getPriority()
-            . ', ' . $this->getPayloadType($message);
+            . ', ' . $this->getPayloadDescription($message);
     }
 
-    private function getPayloadType(MessageInterface $message): string
+    private function getPayloadDescription(MessageInterface $message): string
     {
         if (is_object($message->getPayload())) {
             return get_class($message->getPayload());
@@ -151,7 +151,7 @@ final class MessageHandler implements MessageHandlerInterface
             return 'array';
         }
 
-        return $message->getPayload();
+        return (string) $message->getPayload();
     }
 
     private function initiateHandling(MessageInterface $message): void
