@@ -29,8 +29,14 @@
     </filter>
 
     <php>
-        <env name="RABBITMQ_HOST" value="queue"/>
-        <env name="RABBITMQ_USER" value="alice"/>
-        <env name="RABBITMQ_PASSWORD" value="in_wonderland"/>
+        <env name="RABBITMQ_HOST_ci" value="localhost"/>
+        <env name="RABBITMQ_USER_ci" value="guest"/>
+        <env name="RABBITMQ_PASSWORD_ci" value="guest"/>
+
+        <env name="RABBITMQ_HOST_dev" value="queue"/>
+        <env name="RABBITMQ_USER_dev" value="alice"/>
+        <env name="RABBITMQ_PASSWORD_dev" value="in_wonderland"/>
+
+        <env name="SECONDS_TO_WAIT_FOR_CONTAINERS" value="3"/>
     </php>
 </phpunit>

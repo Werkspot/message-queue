@@ -254,22 +254,22 @@ final class AmqpTest extends TestCase
 
     private static function getRabbitHost(): string
     {
-        return getenv('RABBITMQ_HOST');
+        return getenv('RABBITMQ_HOST_' . getEnvironment());
     }
 
     private static function getRabbitPort(): int
     {
-        $port = getenv('RABBITMQ_PORT');
+        $port = getenv('RABBITMQ_PORT_' . getEnvironment());
         return $port ?: self::DEFAULT_RABBITMQ_PORT;
     }
 
     private static function getRabbitUser(): string
     {
-        return getenv('RABBITMQ_USER');
+        return getenv('RABBITMQ_USER_' . getEnvironment());
     }
 
     private static function getRabbitPassword(): string
     {
-        return getenv('RABBITMQ_PASSWORD');
+        return getenv('RABBITMQ_PASSWORD_' . getEnvironment());
     }
 }
