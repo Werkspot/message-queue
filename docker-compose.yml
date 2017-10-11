@@ -6,7 +6,7 @@ services:
     image: "werkspot/message-queue:application_php_7.1"
     working_dir: /opt/message-queue
     volumes:
-      - ../../:/opt/message-queue
+      - .:/opt/message-queue
     links:
       - queue
 

@@ -12,10 +12,10 @@ switch ($env) {
         break;
     default:
         system(
-            "docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application " . $command,
+            "docker-compose -f $rootDir/docker-compose.yml run --rm application " . $command,
             $returnVal
         );
-        system("docker-compose -f $rootDir/tests/container/docker-compose.yml down");
+        system("docker-compose -f $rootDir/docker-compose.yml down");
 }
 
 exit($returnVal);
