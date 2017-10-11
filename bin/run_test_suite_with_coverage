@@ -5,17 +5,22 @@ $rootDir = __DIR__ . '/..';
 $returnVal = 0;
 
 $env = getenv('ENV') ?: 'dev';
-$command = 'php -dzend_extension=xdebug.so vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover.xml';
+$command = 'php -dzend_extension=xdebug.so vendor/bin/phpunit';
+
+$command .= (isset($argv[1]) && $argv[1] == '--html')
+    ? ' --coverage-text --coverage-html=coverage-html'
+    : ' --coverage-text --coverage-clover=coverage.clover.xml';
+
 switch ($env) {
     case 'ci':
         system($command, $returnVal);
         break;
     default:
         system(
-            "docker-compose -f $rootDir/tests/container/docker-compose.yml run --rm application " . $command,
+            "docker-compose -f $rootDir/docker-compose.yml run --rm application " . $command,
             $returnVal
         );
-        system("docker-compose -f $rootDir/tests/container/docker-compose.yml down");
+        system("docker-compose -f $rootDir/docker-compose.yml down");
 }
 
 exit($returnVal);

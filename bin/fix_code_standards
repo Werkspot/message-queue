@@ -14,7 +14,7 @@ switch ($env) {
         break;
     default:
         system(
-            "docker-compose -f $rootDir/tests/container/docker-compose.yml run --no-deps --rm application " . $command,
+            "docker run --volume $rootDir:/opt/message-queue -w /opt/message-queue --rm werkspot/message-queue:application_php_7.1 " . $command,
             $returnVal
         );
 }
